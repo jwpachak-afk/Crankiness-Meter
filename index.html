@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crankiness Meter</title>
+
+<style>
+:root { --bg:#f6f1e6; --ink:#111; }
+* { box-sizing:border-box; }
+
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:18px;
+}
+
+.wrap{
+  width:min(900px,100%);
+  display:grid;
+  gap:14px;
+  justify-items:center;
+}
+
+h1{
+  margin:0;
+  font-weight:900;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  font-size:clamp(22px,4vw,42px);
+}
+
+.card{
+  width:100%;
+  background: rgba(255,255,255,.35);
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:18px;
+  padding:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.06);
+}
+
+svg{ width:100%; height:auto; display:block; }
+
+.rim{ stroke:#111; stroke-width:10; fill:none; }
+.seg{ stroke:#111; stroke-width:6; }
+
+.label{
+  font-weight:900;
+  letter-spacing:.04em;   /* IMPORTANT: less spacing to prevent truncation */
+  text-transform:uppercase;
+  fill:#111;
+}
+
+.needle{
+  transform-origin:450px 540px;
+  transition:transform 250ms cubic-bezier(.2,.8,.2,1);
+  filter: drop-shadow(0 6px 8px rgba(0,0,0,.22));
+}
+
+.row{ display:grid; gap:12px; margin-top:8px; }
+
+.meter-readout{
+  font-weight:900;
+  font-size:18px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+input[type=range]{ width:100%; }
+
+.btns{ display:flex; flex-wrap:wrap; gap:8px; }
+
+button{
+  border:1px solid rgba(0,0,0,.15);
+  background:rgba(255,255,255,.75);
+  padding:8px 10px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:800;
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <h1>Crankiness Meter</h1>
+
+  <div class="card">
+    <!-- tighter framing -->
+    <svg viewBox="0 150 900 470" text-rendering="optimizeLegibility" aria-label="Crankiness meter">
+
+      <!-- rim -->
+      <path class="rim" d="M90 540 A360 360 0 0 1 810 540"/>
+
+      <!-- segments -->
+      <path class="seg" fill="#4f7a3f" d="M90 540 A360 360 0 0 1 138 356 L285 423 A170 170 0 0 0 260 517 Z"/>
+      <path class="seg" fill="#86a95b" d="M138 356 A360 360 0 0 1 267 240 L355 386 A170 170 0 0 0 285 423 Z"/>
+      <path class="seg" fill="#f2b037" d="M267 240 A360 360 0 0 1 450 180 L450 350 A170 170 0 0 0 355 386 Z"/>
+      <path class="seg" fill="#ee8f2e" d="M450 180 A360 360 0 0 1 633 240 L545 386 A170 170 0 0 0 450 350 Z"/>
+      <path class="seg" fill="#d5672d" d="M633 240 A360 360 0 0 1 762 356 L615 423 A170 170 0 0 0 545 386 Z"/>
+      <path class="seg" fill="#b64a36" d="M762 356 A360 360 0 0 1 810 540 L640 517 A170 170 0 0 0 615 423 Z"/>
+
+      <!-- inner cut -->
+      <path d="M280 540 A170 170 0 0 1 620 540 L620 650 L280 650 Z" fill="var(--bg)"/>
+
+      <!-- Longer label arcs (less trimmed) -->
+      <defs>
+        <!-- radius 325 (a bit bigger) + longer endpoints = more room for words -->
+        <path id="a1" d="M 124 533 A 325 325 0 0 1 170 388" />
+        <path id="a2" d="M 186 370 A 325 325 0 0 1 286 270" />
+        <path id="a3" d="M 310 255 A 325 325 0 0 1 450 210" />
+        <path id="a4" d="M 450 210 A 325 325 0 0 1 590 255" />
+        <path id="a5" d="M 614 270 A 325 325 0 0 1 714 370" />
+        <path id="a6" d="M 730 388 A 325 325 0 0 1 776 533" />
+      </defs>
+
+      <!-- Arc labels (slightly smaller to avoid clipping on mobile) -->
+      <text class="label" font-size="22">
+        <textPath href="#a1" startOffset="50%" text-anchor="middle">SARCASTIC</textPath>
+      </text>
+      <text class="label" font-size="22">
+        <textPath href="#a2" startOffset="50%" text-anchor="middle">IRRITABLE</textPath>
+      </text>
+      <text class="label" font-size="22">
+        <textPath href="#a3" startOffset="50%" text-anchor="middle">CYNICAL</textPath>
+      </text>
+      <text class="label" font-size="22">
+        <textPath href="#a4" startOffset="50%" text-anchor="middle">BITTER</textPath>
+      </text>
+      <text class="label" font-size="22">
+        <textPath href="#a5" startOffset="50%" text-anchor="middle">DISGUSTED</textPath>
+      </text>
+      <text class="label" font-size="22">
+        <textPath href="#a6" startOffset="50%" text-anchor="middle">HATEFUL</textPath>
+      </text>
+
+      <!-- needle (zeroed correctly) -->
+      <g id="needle" class="needle">
+        <path d="M450 540 L775 530 L775 550 Z" fill="#111"/>
+        <circle cx="450" cy="540" r="40" fill="#111"/>
+        <circle cx="450" cy="540" r="18" fill="#2a2a2a"/>
+      </g>
+
+    </svg>
+
+    <div class="row">
+      <div class="meter-readout">
+        <div>Level: <span id="labelOut">—</span></div>
+        <div>Value: <span id="valueOut">0.000</span></div>
+      </div>
+
+      <input id="slider" type="range" min="0" max="1" step="0.001" value="0">
+
+      <div class="btns">
+        <button data-v="0.05">Sarcastic</button>
+        <button data-v="0.22">Irritable</button>
+        <button data-v="0.40">Cynical</button>
+        <button data-v="0.58">Bitter</button>
+        <button data-v="0.76">Disgusted</button>
+        <button data-v="1.00">Hateful</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const needle = document.getElementById("needle");
+const slider = document.getElementById("slider");
+const labelOut = document.getElementById("labelOut");
+const valueOut = document.getElementById("valueOut");
+
+const bands = [
+  ["Sarcastic",1/6],
+  ["Irritable",2/6],
+  ["Cynical",3/6],
+  ["Bitter",4/6],
+  ["Disgusted",5/6],
+  ["Hateful",1.01]
+];
+
+function bandName(v){ return bands.find(b=>v<b[1])[0]; }
+
+function setValue(v){
+  v = Math.max(0, Math.min(1, Number(v)));
+  slider.value = v;
+  needle.style.transform = `rotate(${-180 + 180*v}deg)`;
+  labelOut.textContent = bandName(v);
+  valueOut.textContent = v.toFixed(3);
+}
+
+slider.oninput = e => setValue(e.target.value);
+document.querySelectorAll("button[data-v]").forEach(b => b.onclick = () => setValue(b.dataset.v));
+setValue(0);
+</script>
+</body>
+</html>
